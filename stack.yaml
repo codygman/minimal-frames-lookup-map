@@ -1,0 +1,7 @@
+resolver: lts-7.15
+packages:
+- '.'
+extra-deps: []
+
+ghc-options:
+  ! '*': -O2 -threaded -rtsopts -with-rtsopts=-N 
