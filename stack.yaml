@@ -1,6 +1,7 @@
 resolver: lts-7.15
 packages:
 - '.'
+- judy-0.3.0
 extra-deps: []
 
 ghc-options:

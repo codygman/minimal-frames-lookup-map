@@ -10,16 +10,24 @@ import qualified Data.Map.Strict as M
 import qualified Pipes.Prelude as P
 import Pipes hiding (Proxy)
 import Frames
+import qualified Data.Judy as J
 
 tableTypes "Row" "data/purchasing-card-data-2014-large.csv"
 
 rows :: Producer Row IO ()
 rows = readTable "data/purchasing-card-data-2014-large.csv"
 
+
+--   hEmpty <- J.new :: IO (J.JudyL Int)
+--   P.fold (\m r -> J.insert r ("text" :: T.Text) m) hEmpty id (P.each [0..iterations])
+
+
 main :: IO ()
 main = do
   -- generate a lookup map based on a producer
-  lookupMap <- P.fold (\m r -> M.insert (rget jVReference r) (rget serviceArea r) m) M.empty id rows
+  -- lookupMap <- P.fold (\m r -> M.insert (rget jVReference r) (rget serviceArea r) m) M.empty id rows
+  hEmpty <- J.new :: IO (J.JudyL Int)
+  lookupMap <- P.fold (\m r -> J.insert (rget jVReference r) (rget serviceArea r) m) hEmpty id rows
 
   -- filter some rows based on said lookupMap
   print =<< P.length (rows >-> P.filter (\r -> rget jVReference r `M.member` lookupMap))
@@ -419,4 +427,8 @@ main = do
 
 -- multi-threaded version
 -- stack build --executable-profiling --library-profiling --ghc-options="-O -threaded -fprof-auto -rtsopts" &&  .stack-work/install/x86_64-linux/lts-7.15/8.0.1.20161213/bin/minimal-frames-lookup-map +RTS -N4 -p
+
+
+  cp minimal-frames-lookup-map.ps minimal-frames-lookup-map_hd.ps
+cp minimal-frames-lookup-map.ps  minimal-frames-lookup-map_hy.ps
 
